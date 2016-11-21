@@ -748,6 +748,7 @@
 - [`KT-15133`](https://youtrack.jetbrains.com/issue/KT-15133) Recent gradle-script-kotlin 3.3 distributions are unusable
 - [`KT-15218`](https://youtrack.jetbrains.com/issue/KT-15218) Isolate Gradle Kotlin compiler process
 
+- [`KT-14829`](https://youtrack.jetbrains.com/issue/KT-14829) Inline Type Alias: Improve inline dialog. Support single-usage inlining
 
 ## 1.1-M03 (EAP-3)
 

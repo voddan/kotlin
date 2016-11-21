@@ -21,9 +21,12 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
+import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiReference
+import com.intellij.refactoring.JavaRefactoringSettings
 import com.intellij.refactoring.RefactoringBundle
 import com.intellij.refactoring.util.RefactoringMessageDialog
 import com.intellij.usageView.UsageInfo
@@ -99,4 +102,17 @@ internal fun <E : KtElement> postProcessInternalReferences(inlinedElement: E): E
     expressionsToProcess.forEach { it.internalUsageInfos = null }
     postProcessMoveUsages(internalUsages)
     return pointer.element
+}
+
+enum class InlineMode {
+    ALL, PRIMARY, NONE
+}
+
+internal fun showDialog(property: KtNamedDeclaration, ref: PsiReference?, occurrenceCount: Int): InlineMode {
+    if (ApplicationManager.getApplication().isUnitTestMode) return InlineMode.ALL
+    if ((ref == null || occurrenceCount <= 1) && !EditorSettingsExternalizable.getInstance().isShowInlineLocalDialog) return InlineMode.ALL
+
+    val dialog = KotlinInlineDialog(property, ref, occurrenceCount)
+    if (!dialog.showAndGet()) return InlineMode.NONE
+    return if (JavaRefactoringSettings.getInstance().INLINE_LOCAL_THIS) InlineMode.PRIMARY else InlineMode.ALL
 }

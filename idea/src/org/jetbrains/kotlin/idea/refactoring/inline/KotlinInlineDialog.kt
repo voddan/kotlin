@@ -20,16 +20,24 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiReference
 import com.intellij.refactoring.JavaRefactoringSettings
 import com.intellij.refactoring.inline.AbstractInlineLocalDialog
+import org.jetbrains.kotlin.psi.KtNamedDeclaration
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtTypeAlias
+import org.jetbrains.kotlin.psi.psiUtil.getElementTextWithContext
 
-class KotlinInlineValDialog(
-        element: KtProperty,
+class KotlinInlineDialog<T: KtNamedDeclaration>(
+        element: T,
         ref: PsiReference?,
         private val occurrenceCount: Int
 ) : AbstractInlineLocalDialog(element.project, element, ref, occurrenceCount) {
-    private val property: KtProperty get() = myElement as KtProperty
+    @Suppress("UNCHECKED_CAST")
+    private val declaration: T get() = myElement as T
 
-    private val kind = if (property.isLocal) "local variable" else "property"
+    private val kind = when (declaration) {
+        is KtProperty -> if ((declaration as KtProperty).isLocal) "local variable" else "property"
+        is KtTypeAlias -> "type alias"
+        else -> error("Unexpected declaration: ${declaration.getElementTextWithContext()}")
+    }
 
     private val refactoringName = "Inline ${StringUtil.capitalizeWords(kind, true)}"
 
@@ -41,7 +49,7 @@ class KotlinInlineValDialog(
 
     override fun getBorderTitle() = refactoringName
 
-    override fun getNameLabelText() = "${kind.capitalize()} ${property.name}"
+    override fun getNameLabelText() = "${kind.capitalize()} ${declaration.name}"
 
     override fun getInlineAllText(): String? {
         val occurrencesString = if (occurrenceCount >= 0) {

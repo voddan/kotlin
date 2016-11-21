@@ -23,7 +23,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.searches.ReferencesSearch
-import com.intellij.refactoring.HelpID
 import com.intellij.refactoring.RefactoringBundle
 import com.intellij.refactoring.util.CommonRefactoringUtil
 import org.jetbrains.kotlin.builtins.isExtensionFunctionType
@@ -77,6 +76,18 @@ class KotlinInlineTypeAliasHandler : InlineActionHandler() {
                 ?: refElement.getNonStrictParentOfType<KtSimpleNameExpression>()
         }
 
+        val primaryUsage = if (editor != null) {
+            val offset = editor.caretModel.offset
+            usages.firstOrNull { it.textRange.contains(offset) }
+        }
+        else null
+        val primaryRefExpression = when (primaryUsage) {
+            is KtUserType -> primaryUsage.referenceExpression
+            is KtSimpleNameExpression -> primaryUsage
+            else -> null
+        }
+        val primaryRef = primaryRefExpression?.mainReference
+
         if (usages.isEmpty()) return showErrorHint(project, editor, "Type alias '$name' is never used")
 
         val usagesInOriginalFile = usages.filter { it.containingFile == file }
@@ -87,12 +98,8 @@ class KotlinInlineTypeAliasHandler : InlineActionHandler() {
             preProcessInternalUsages(aliasBody, usages)
         }
 
-        if (!showDialog(project,
-                        name,
-                        REFACTORING_NAME,
-                        typeAlias,
-                        usages,
-                        HelpID.INLINE_VARIABLE)) {
+        val inlineMode = showDialog(typeAlias, primaryRef, usages.size)
+        if (inlineMode == InlineMode.NONE) {
             if (isHighlighting) {
                 val statusBar = WindowManager.getInstance().getStatusBar(project)
                 statusBar?.info = RefactoringBundle.message("press.escape.to.remove.the.highlighting")
@@ -177,7 +184,8 @@ class KotlinInlineTypeAliasHandler : InlineActionHandler() {
         }
 
         project.executeWriteCommand(RefactoringBundle.message("inline.command", name)) {
-            val inlinedElements = usages.mapNotNull {
+            val usagesToInline = if (inlineMode == InlineMode.ALL) usages else listOf(primaryUsage)
+            val inlinedElements = usagesToInline.mapNotNull {
                 val inlinedElement = when (it) {
                                          is KtUserType -> inlineIntoType(it)
                                          is KtReferenceExpression -> inlineIntoCall(it)
@@ -191,7 +199,9 @@ class KotlinInlineTypeAliasHandler : InlineActionHandler() {
                 highlightElements(project, editor, inlinedElements)
             }
 
-            typeAlias.delete()
+            if (inlineMode == InlineMode.ALL) {
+                typeAlias.delete()
+            }
 
             ShortenReferences.DEFAULT.process(inlinedElements)
         }
