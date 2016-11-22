@@ -314,6 +314,9 @@
     <projectService serviceInterface="org.jetbrains.kotlin.idea.kdoc.SampleResolutionService"
                     serviceImplementation="org.jetbrains.kotlin.idea.kdoc.IdeSampleResolutionService"/>
 
+    <projectService serviceInterface="org.jetbrains.kotlin.psi.InternalScopeProvider"
+                    serviceImplementation="org.jetbrains.kotlin.idea.InternalScopeProviderImpl"/>
+
     <errorHandler implementation="org.jetbrains.kotlin.idea.reporter.KotlinReportSubmitter"/>
 
     <internalFileTemplate name="Kotlin File"/>

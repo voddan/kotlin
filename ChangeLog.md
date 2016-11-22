@@ -1097,6 +1097,7 @@ These artifacts include extensions for the types available in the latter JDKs, s
 
 - [`KT-13811`](https://youtrack.jetbrains.com/issue/KT-13811) Expose JVM target setting in IntelliJ IDEA plugin compiler configuration UI
 - [`KT-12410`](https://youtrack.jetbrains.com/issue/KT-12410) Expose language version setting in IntelliJ IDEA plugin compiler configuration UI
+- [`KT-14474`](https://youtrack.jetbrains.com/issue/KT-14474) Restrict search scope of "internal" declaration to the corresponding module
 
 #### Intention actions, inspections and quickfixes
 

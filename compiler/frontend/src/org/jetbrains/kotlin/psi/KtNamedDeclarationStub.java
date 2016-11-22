@@ -136,6 +136,13 @@ abstract class KtNamedDeclarationStub<T extends KotlinStubWithFqName<?>> extends
             scope = scope.intersectWith(classOrObject.getUseScope());
         }
 
+        if (hasModifier(KtTokens.INTERNAL_KEYWORD)) {
+            InternalScopeProvider scopeProvider = InternalScopeProvider.Companion.getInstance(getProject());
+            if (scopeProvider != null) {
+                scope = scope.intersectWith(scopeProvider.getInternalScope(this));
+            }
+        }
+
         return scope;
     }
 
