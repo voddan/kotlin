@@ -82,6 +82,11 @@
       <add-to-group group-id="KotlinToolsGroup"/>
     </action>
 
+    <action id="ConfigureKotlinCommonInProject" class="org.jetbrains.kotlin.idea.actions.ConfigureKotlinCommonInProjectAction"
+            text="Configure Kotlin (Common) in Project">
+      <add-to-group group-id="KotlinToolsGroup"/>
+    </action>
+
     <action id="KotlinConfigureUpdates" class="org.jetbrains.kotlin.idea.actions.ConfigurePluginUpdatesAction"
             text="Configure Kotlin Plugin Updates"
             description="Configure automatic updates for the Kotlin plugin">
