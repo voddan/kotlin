@@ -390,6 +390,18 @@ public class WriteFlagsTestGenerated extends AbstractWriteFlagsTest {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/writeFlags/delegatedProperty/visibility/privateSet.kt");
                 doTest(fileName);
             }
+
+            @TestMetadata("provideDelegateInClassCompanion.kt")
+            public void testProvideDelegateInClassCompanion() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/writeFlags/delegatedProperty/visibility/provideDelegateInClassCompanion.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("provideDelegateInInterfaceCompanion.kt")
+            public void testProvideDelegateInInterfaceCompanion() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/writeFlags/delegatedProperty/visibility/provideDelegateInInterfaceCompanion.kt");
+                doTest(fileName);
+            }
         }
     }
 

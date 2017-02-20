@@ -7418,6 +7418,12 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("interfaceCompanion.kt")
+            public void testInterfaceCompanion() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/delegatedProperty/provideDelegate/interfaceCompanion.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("jvmStaticInObject.kt")
             public void testJvmStaticInObject() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/delegatedProperty/provideDelegate/jvmStaticInObject.kt");
@@ -7433,6 +7439,12 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             @TestMetadata("kt15437.kt")
             public void testKt15437() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/delegatedProperty/provideDelegate/kt15437.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("kt16441.kt")
+            public void testKt16441() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/delegatedProperty/provideDelegate/kt16441.kt");
                 doTest(fileName);
             }
 
