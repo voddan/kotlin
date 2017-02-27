@@ -5399,6 +5399,12 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
     public static class Coroutines extends AbstractJsCodegenBoxTest {
+        @TestMetadata("32defaultParametersInSuspend.kt")
+        public void test32defaultParametersInSuspend() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/coroutines/32defaultParametersInSuspend.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("accessorForSuspend.kt")
         public void testAccessorForSuspend() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/coroutines/accessorForSuspend.kt");
