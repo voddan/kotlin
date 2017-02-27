@@ -478,6 +478,8 @@
     <renameHandler implementation="org.jetbrains.kotlin.idea.refactoring.rename.RenameBackingFieldReferenceHandler"/>
     <renameHandler implementation="org.jetbrains.kotlin.idea.refactoring.rename.RenameClassByCompanionObjectShortReferenceHandler"/>
     <renameHandler implementation="org.jetbrains.kotlin.idea.refactoring.rename.RenameFunctionByLabeledReferenceInLambdaArgumentHandler"/>
+    <renameHandler implementation="org.jetbrains.kotlin.idea.refactoring.rename.KotlinVariableInplaceRenameHandler"/>
+    <renameHandler implementation="org.jetbrains.kotlin.idea.refactoring.rename.KotlinMemberInplaceRenameHandler"/>
     <automaticRenamerFactory implementation="org.jetbrains.kotlin.idea.refactoring.rename.AutomaticVariableRenamerFactory"/>
     <automaticRenamerFactory implementation="org.jetbrains.kotlin.idea.refactoring.rename.AutomaticVariableRenamerFactoryForJavaClass"/>
     <automaticRenamerFactory implementation="org.jetbrains.kotlin.idea.refactoring.rename.AutomaticVariableInJavaRenamerFactory"/>

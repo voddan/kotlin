@@ -51,7 +51,7 @@ class KotlinRefactoringSupportProvider : RefactoringSupportProvider() {
     fun getExtractFunctionToScopeHandler(): RefactoringActionHandler =
             ExtractKotlinFunctionHandler(true, ExtractKotlinFunctionHandler.InteractiveExtractionHelper)
 
-    override fun isInplaceRenameAvailable(element: PsiElement, context: PsiElement?): Boolean {
+    fun isKotlinVariableInplaceRenameAvailable(element: PsiElement): Boolean {
         when (element) {
             is KtTypeParameter -> return true
             is KtProperty -> {
@@ -74,8 +74,6 @@ class KotlinRefactoringSupportProvider : RefactoringSupportProvider() {
         }
         return false
     }
-
-    override fun isMemberInplaceRenameAvailable(element: PsiElement, context: PsiElement?) = element is KtNamedDeclaration
 
     override fun getChangeSignatureHandler() = KotlinChangeSignatureHandler()
 
