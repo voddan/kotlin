@@ -87,8 +87,13 @@ public class CompileKotlinAgainstCustomBinariesTest extends TestCaseWithTmpdir {
 
     @NotNull
     private File compileLibrary(@NotNull String sourcePath, @NotNull File... extraClassPath) {
+        return compileLibrary(sourcePath, Collections.<String>emptyList());
+    }
+
+    @NotNull
+    private File compileLibrary(@NotNull String sourcePath, List<String> additionalOptions, @NotNull File... extraClassPath) {
         File result = new File(tmpdir, sourcePath + ".jar");
-        Pair<String, ExitCode> output = compileKotlin(sourcePath, result, extraClassPath);
+        Pair<String, ExitCode> output = compileKotlin(sourcePath, result, additionalOptions, extraClassPath);
         Assert.assertEquals(normalizeOutput(new Pair<String, ExitCode>("", ExitCode.OK)), normalizeOutput(output));
         return result;
     }
@@ -579,5 +584,15 @@ public class CompileKotlinAgainstCustomBinariesTest extends TestCaseWithTmpdir {
 
         Pair<String, ExitCode> output = compileKotlin("source.kt", tmpdir, library1);
         KotlinTestUtils.assertEqualsToFile(new File(getTestDataDirectory(), "output.txt"), normalizeOutput(output));
+    }
+
+    public void testWrongInlineTarget() throws Exception {
+        File library = compileLibrary("library", Arrays.asList("-jvm-target", "1.8"));
+
+        Pair<String, ExitCode> outputMain = compileKotlin("source.kt", tmpdir, library);
+
+        KotlinTestUtils.assertEqualsToFile(
+                new File(getTestDataDirectory(), "output.txt"), normalizeOutput(outputMain)
+        );
     }
 }
