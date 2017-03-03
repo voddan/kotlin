@@ -28,6 +28,8 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptor
 import org.jetbrains.kotlin.idea.codeInsight.DescriptorToSourceUtilsIde
+import org.jetbrains.kotlin.idea.highlighter.markers.headerImplementations
+import org.jetbrains.kotlin.idea.highlighter.markers.liftToHeader
 import org.jetbrains.kotlin.idea.refactoring.changeSignature.usages.KotlinCallableDefinitionUsage
 import org.jetbrains.kotlin.idea.util.IdeDescriptorRenderers
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
@@ -98,9 +100,17 @@ class KotlinChangeSignatureData(
 
     override val affectedCallables: Collection<UsageInfo> by lazy {
         primaryCallables + primaryCallables.flatMapTo(HashSet<UsageInfo>()) { primaryFunction ->
-            val primaryDeclaration = primaryFunction.declaration as? KtCallableDeclaration
-            val lightMethods = primaryDeclaration?.toLightMethods() ?: Collections.emptyList()
-            lightMethods.flatMap { baseMethod ->
+            val primaryDeclaration = primaryFunction.declaration as? KtCallableDeclaration ?: return@flatMapTo emptyList()
+
+            primaryDeclaration.liftToHeader()?.let {
+                return@flatMapTo it.headerImplementations().map {
+                    KotlinCallableDefinitionUsage<PsiElement>(
+                            it, it.resolveToDescriptor() as CallableDescriptor, primaryFunction, null
+                    )
+                }
+            }
+
+            primaryDeclaration.toLightMethods().flatMap { baseMethod ->
                 OverridingMethodsSearch
                         .search(baseMethod)
                         .mapNotNullTo(HashSet<UsageInfo>()) { overridingMethod ->
