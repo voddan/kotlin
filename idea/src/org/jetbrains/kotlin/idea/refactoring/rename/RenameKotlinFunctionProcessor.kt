@@ -35,6 +35,7 @@ import com.intellij.util.SmartList
 import org.jetbrains.kotlin.asJava.LightClassUtil
 import org.jetbrains.kotlin.asJava.elements.KtLightElement
 import org.jetbrains.kotlin.asJava.elements.KtLightMethod
+import org.jetbrains.kotlin.asJava.namedUnwrappedElement
 import org.jetbrains.kotlin.asJava.unwrapped
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptor
@@ -44,6 +45,7 @@ import org.jetbrains.kotlin.idea.refactoring.checkSuperMethodsWithPopup
 import org.jetbrains.kotlin.idea.refactoring.dropOverrideKeywordIfNecessary
 import org.jetbrains.kotlin.idea.references.KtReference
 import org.jetbrains.kotlin.idea.util.application.runReadAction
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import java.lang.IllegalStateException
@@ -107,6 +109,10 @@ class RenameKotlinFunctionProcessor : RenameKotlinPsiProcessor() {
     }
 
     override fun substituteElementToRename(element: PsiElement?, editor: Editor?): PsiElement?  {
+        (element?.namedUnwrappedElement as? KtNamedDeclaration)?.let {
+            if (it.hasModifier(KtTokens.HEADER_KEYWORD) || it.hasModifier(KtTokens.IMPL_KEYWORD)) return element
+        }
+
         val wrappedMethod = wrapPsiMethod(element) ?: return element
 
         val deepestSuperMethods = wrappedMethod.findDeepestSuperMethods()
@@ -137,6 +143,10 @@ class RenameKotlinFunctionProcessor : RenameKotlinPsiProcessor() {
                 substitutedJavaElement
             }
             renameCallback.pass(elementToProcess)
+        }
+
+        (element.namedUnwrappedElement as? KtNamedDeclaration)?.let {
+            if (it.hasModifier(KtTokens.HEADER_KEYWORD) || it.hasModifier(KtTokens.IMPL_KEYWORD)) return preprocessAndPass(element)
         }
 
         val wrappedMethod = wrapPsiMethod(element) ?: return

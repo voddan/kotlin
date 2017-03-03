@@ -25,10 +25,12 @@ import com.intellij.refactoring.rename.naming.AutomaticRenamerFactory
 import com.intellij.usageView.UsageInfo
 import org.jetbrains.annotations.TestOnly
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptor
+import org.jetbrains.kotlin.idea.highlighter.markers.headerDescriptor
 import org.jetbrains.kotlin.idea.util.getAllAccessibleFunctions
 import org.jetbrains.kotlin.idea.util.getResolutionScope
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
@@ -68,11 +70,22 @@ private fun KtNamedFunction.getOverloads(): Collection<FunctionDescriptor> {
     val scope = getResolutionScope(context, resolutionFacade)
     val extensionReceiverClass = descriptor.extensionReceiverParameter?.type?.constructor?.declarationDescriptor as? ClassDescriptor
 
-    val overloadsFromFunctionScope = scope.getAllAccessibleFunctions(name)
-    if (extensionReceiverClass == null) return overloadsFromFunctionScope
+    val result = ArrayList<FunctionDescriptor>()
 
-    val overloadsFromExtensionReceiver = extensionReceiverClass.unsubstitutedMemberScope.getContributedFunctions(name, NoLookupLocation.FROM_IDE)
-    return overloadsFromFunctionScope + overloadsFromExtensionReceiver
+    scope.getAllAccessibleFunctions(name).let { overloadsFromFunctionScope ->
+        if (descriptor is CallableMemberDescriptor && descriptor.isImpl ) {
+            overloadsFromFunctionScope.filterNotTo(result) { descriptor.headerDescriptor() == it }
+        }
+        else {
+            result += overloadsFromFunctionScope
+        }
+    }
+
+    if (extensionReceiverClass != null) {
+        result += extensionReceiverClass.unsubstitutedMemberScope.getContributedFunctions(name, NoLookupLocation.FROM_IDE)
+    }
+
+    return result
 }
 
 class AutomaticOverloadsRenamerFactory : AutomaticRenamerFactory {
