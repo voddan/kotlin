@@ -34,6 +34,7 @@ State state = new File(basedir, "build.log").readLines().collect { it.replaceAll
                 replace("\\", "/").
                 replaceAll(/[0-9]+\s*ms/, "LLL ms").
                 trim().
+                replaceAll(/\[WARNING] Running the Kotlin compiler under Java 6 or 7 is unsupported and will no longer be possible in a future update./, "").
                 replaceAll(/^\[[A-Z]+\]$/, "").
                 replaceAll(/version [0-9a-z-+\.]+/, "version @snapshot@")
 
