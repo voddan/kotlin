@@ -72,9 +72,9 @@ sealed class ChangeCoroutineSupportFix(
 
             val facetSettings = KotlinFacet.get(module)?.configuration?.settings ?: return
             ModuleRootModificationUtil.updateModel(module) {
-                facetSettings.compilerInfo.coroutineSupport = coroutineSupport
-                facetSettings.versionInfo.apiLevel = LanguageVersion.KOTLIN_1_1
-                facetSettings.versionInfo.languageLevel = LanguageVersion.KOTLIN_1_1
+                facetSettings.coroutineSupport = coroutineSupport
+                facetSettings.apiLevel = LanguageVersion.KOTLIN_1_1
+                facetSettings.languageLevel = LanguageVersion.KOTLIN_1_1
             }
         }
 

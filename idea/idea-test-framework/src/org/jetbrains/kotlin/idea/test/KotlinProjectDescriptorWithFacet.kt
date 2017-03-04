@@ -32,7 +32,7 @@ class KotlinProjectDescriptorWithFacet(val languageVersion: LanguageVersion) : K
         val facetModel = facetManager.createModifiableModel()
         val configuration = KotlinFacetConfiguration()
         configuration.settings.useProjectSettings = false
-        configuration.settings.versionInfo.languageLevel = languageVersion
+        configuration.settings.languageLevel = languageVersion
         val facet = facetManager.createFacet(KotlinFacetType.INSTANCE, "Kotlin", configuration, null)
         facetModel.addFacet(facet)
         runInEdtAndWait {

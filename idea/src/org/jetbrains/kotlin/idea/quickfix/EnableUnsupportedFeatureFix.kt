@@ -64,7 +64,7 @@ sealed class EnableUnsupportedFeatureFix(
             } ?: false
 
             val facetSettings = KotlinFacet.get(module)?.configuration?.settings ?: return
-            val targetApiLevel = facetSettings.versionInfo.apiLevel?.let { apiLevel ->
+            val targetApiLevel = facetSettings.apiLevel?.let { apiLevel ->
                 if (ApiVersion.createByLanguageVersion(apiLevel) < feature.sinceApiVersion)
                     feature.sinceApiVersion.versionString
                 else
@@ -96,7 +96,7 @@ sealed class EnableUnsupportedFeatureFix(
             }
 
             ModuleRootModificationUtil.updateModel(module) {
-                with(facetSettings.versionInfo) {
+                with(facetSettings) {
                     if (!apiVersionOnly) {
                         languageLevel = targetVersion
                     }
