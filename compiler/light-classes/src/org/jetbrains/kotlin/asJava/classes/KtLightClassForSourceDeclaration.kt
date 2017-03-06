@@ -59,7 +59,7 @@ import java.util.*
 import javax.swing.Icon
 
 abstract class KtLightClassForSourceDeclaration(protected val classOrObject: KtClassOrObject)
-    : KtLightClassBase(classOrObject.manager), StubBasedPsiElement<KotlinClassOrObjectStub<out KtClassOrObject>> {
+    : KtLightClassWithClassData(classOrObject.manager), StubBasedPsiElement<KotlinClassOrObjectStub<out KtClassOrObject>> {
     private val lightIdentifier = KtLightIdentifier(this, classOrObject)
 
     private val _extendsList by lazy(LazyThreadSafetyMode.PUBLICATION) {
@@ -80,7 +80,7 @@ abstract class KtLightClassForSourceDeclaration(protected val classOrObject: KtC
 
     override val clsDelegate: PsiClass get() = lightClassData.clsDelegate
 
-    private val lightClassData: LightClassData by lazy(LazyThreadSafetyMode.PUBLICATION) { findLightClassData() }
+    override val lightClassData: LightClassData by lazy(LazyThreadSafetyMode.PUBLICATION) { findLightClassData() }
 
     open protected fun findLightClassData() = getLightClassDataHolder().findDataForClassOrObject(classOrObject)
 
@@ -321,10 +321,6 @@ abstract class KtLightClassForSourceDeclaration(protected val classOrObject: KtC
     override fun getExtendsList() = _extendsList
 
     override fun getImplementsList() = _implementsList
-
-    override fun getOwnFields() = lightClassData.getOwnFields(this)
-    override fun getOwnMethods() = lightClassData.getOwnMethods(this)
-    override fun getSuperTypes() = lightClassData.supertypes
 
     companion object {
         private val JAVA_API_STUB = Key.create<CachedValue<LightClassDataHolder>>("JAVA_API_STUB")
