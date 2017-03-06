@@ -47,7 +47,17 @@ import java.io.File
 abstract class AbstractIdeLightClassTest : KotlinLightCodeInsightFixtureTestCase() {
     fun doTest(testDataPath: String) {
         myFixture.configureByFile(testDataPath)
-        testLightClass(project, myFixture.file as KtFile, testDataPath, { LightClassTestCommon.removeEmptyDefaultImpls(it) })
+        val ktFile = myFixture.file as KtFile
+        testLightClass(testDataPath, { LightClassTestCommon.removeEmptyDefaultImpls(it) }) { fqName ->
+            val tracker = LightClassLazinessChecker.Tracker(fqName)
+            project.withServiceRegistered<StubComputationTracker, PsiClass?>(tracker) {
+                findClass(fqName, ktFile, project)?.apply {
+                    LightClassLazinessChecker.check(this as KtLightClass, tracker)
+                    tracker.allowLevel(FULL)
+                    PsiElementChecker.checkPsiElementStructure(this)
+                }
+            }
+        }
     }
 
     override fun getProjectDescriptor() = KotlinWithJdkAndRuntimeLightProjectDescriptor.INSTANCE
@@ -72,33 +82,18 @@ abstract class AbstractIdeCompiledLightClassTest : KotlinDaemonAnalyzerTestCase(
     private fun libName() = "libFor" + getTestName(false)
 
     fun doTest(testDataPath: String) {
-        testLightClass(project, null, testDataPath, { it })
+        testLightClass(testDataPath, { it }) {
+            findClass(it, null, project)?.apply {
+                PsiElementChecker.checkPsiElementStructure(this)
+            }
+        }
     }
 }
 
-private fun testLightClass(project: Project, ktFile: KtFile?, testDataPath: String, normalize: (String) -> String) {
+private fun testLightClass(testDataPath: String, normalize: (String) -> String, findLightClass: (String) -> PsiClass?) {
     LightClassTestCommon.testLightClass(
             File(testDataPath),
-            findLightClass = { fqName ->
-
-                val tracker = LightClassLazinessChecker.Tracker(fqName)
-                project.withServiceRegistered<StubComputationTracker, PsiClass?>(tracker) {
-                    var clazz: PsiClass? = JavaPsiFacade.getInstance(project).findClass(fqName, GlobalSearchScope.allScope(project))
-                    if (clazz == null) {
-                        clazz = PsiTreeUtil.findChildrenOfType(ktFile, KtClassOrObject::class.java)
-                                .find { fqName.endsWith(it.nameAsName!!.asString()) }
-                                ?.let { KtLightClassForSourceDeclaration.create(it) }
-                    }
-                    if (clazz != null) {
-                        tracker.checkExactLevel(NONE)
-                        LightClassLazinessChecker.check(clazz as KtLightClass, tracker)
-                        PsiElementChecker.checkPsiElementStructure(clazz)
-                        tracker.checkExactLevel(FULL)
-                    }
-                    clazz
-                }
-
-            },
+            findLightClass,
             normalizeText = { text ->
                 //NOTE: ide and compiler differ in names generated for parameters with unspecified names
                 text
@@ -110,6 +105,13 @@ private fun testLightClass(project: Project, ktFile: KtFile?, testDataPath: Stri
                         .run(normalize)
             }
     )
+}
+
+private fun findClass(fqName: String, ktFile: KtFile?, project: Project): PsiClass? {
+    return JavaPsiFacade.getInstance(project).findClass(fqName, GlobalSearchScope.allScope(project)) ?:
+           PsiTreeUtil.findChildrenOfType(ktFile, KtClassOrObject::class.java)
+                   .find { fqName.endsWith(it.nameAsName!!.asString()) }
+                   ?.let { KtLightClassForSourceDeclaration.create(it) }
 }
 
 object LightClassLazinessChecker {
