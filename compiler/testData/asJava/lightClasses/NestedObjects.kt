@@ -12,8 +12,4 @@ class A {
             object G
         }
     }
-
-    inner class D {
-        object O
-    }
 }

@@ -34,14 +34,4 @@ public final class A {
             }
         }
     }
-
-    public final class D {
-        public D() { /* compiled code */ }
-
-        public static final class O {
-            public static final A.D.O INSTANCE;
-
-            private O() { /* compiled code */ }
-        }
-    }
 }
