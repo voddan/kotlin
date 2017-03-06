@@ -34,6 +34,7 @@ import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtPsiUtil
 import org.jetbrains.kotlin.psi.KtScript
+import org.jetbrains.kotlin.psi.psiUtil.isAncestor
 
 abstract class LightClassDataProvider<T : LightClassDataHolder>(
         private val project: Project
@@ -78,7 +79,7 @@ class LightClassDataProviderForClassOrObject(private val classOrObject: KtClassO
                 if (classOrObject === processingClassOrObject) return true
 
                 // process all children
-                if (PsiTreeUtil.isAncestor(classOrObject, processingClassOrObject, true)) {
+                if (classOrObject.isAncestor(processingClassOrObject, true)) {
                     return true
                 }
 
@@ -96,7 +97,7 @@ class LightClassDataProviderForClassOrObject(private val classOrObject: KtClassO
                 // TODO: current method will process local classes in irrelevant declarations, it should be fixed.
                 // We generate all enclosing classes
 
-                if (classOrObject.isLocal() && processingClassOrObject.isLocal()) {
+                if (classOrObject.isLocal && processingClassOrObject.isLocal) {
                     val commonParent = PsiTreeUtil.findCommonParent(classOrObject, processingClassOrObject)
                     return commonParent != null && commonParent !is PsiFile
                 }
@@ -106,7 +107,7 @@ class LightClassDataProviderForClassOrObject(private val classOrObject: KtClassO
 
             override fun shouldGenerateClass(processingClassOrObject: KtClassOrObject): Boolean {
                 // generate outer classes but not their members
-                return shouldGenerateClassMembers(processingClassOrObject) || PsiTreeUtil.isAncestor(processingClassOrObject, classOrObject, true)
+                return shouldGenerateClassMembers(processingClassOrObject) || processingClassOrObject.isAncestor(classOrObject, true)
             }
 
             override fun shouldGenerateScript(script: KtScript): Boolean {
