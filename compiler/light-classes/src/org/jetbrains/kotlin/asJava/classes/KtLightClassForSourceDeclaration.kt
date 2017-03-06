@@ -82,7 +82,7 @@ abstract class KtLightClassForSourceDeclaration(protected val classOrObject: KtC
 
     private val lightClassData: LightClassData by lazy(LazyThreadSafetyMode.PUBLICATION) { findLightClassData() }
 
-    open protected fun findLightClassData() = getLightClassDataHolder().findData(classOrObject)
+    open protected fun findLightClassData() = getLightClassDataHolder().findDataForClassOrObject(classOrObject)
 
     private fun getJavaFileStub(): PsiJavaFileStub = getLightClassDataHolder().javaFileStub
 

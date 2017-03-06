@@ -195,7 +195,7 @@ class KtLightClassForFacade private constructor(
     override fun copy() = KtLightClassForFacade(getManager(), facadeClassFqName, lightClassDataCache, files)
 
     override val clsDelegate: PsiClass
-        get() = lightClassDataCache.value.findData(facadeClassFqName).clsDelegate
+        get() = lightClassDataCache.value.findDataForFacade(facadeClassFqName).clsDelegate
 
     override fun getNavigationElement() = files.iterator().next()
 

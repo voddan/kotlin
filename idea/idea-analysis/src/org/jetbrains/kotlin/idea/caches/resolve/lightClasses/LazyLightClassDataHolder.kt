@@ -50,12 +50,13 @@ class LazyLightClassDataHolder(
     override val javaFileStub get() = exactResult.stub
     override val extraDiagnostics get() = exactResult.diagnostics
 
+    // for facade or defaultImpls
     override fun findData(findDelegate: (PsiJavaFileStub) -> PsiClass): LightClassData =
             LazyLightClassData(relyOnDummySupertypes = true) { lightClassBuilderResult ->
                 findDelegate(lightClassBuilderResult.stub)
             }
 
-    override fun findData(classOrObject: KtClassOrObject): LightClassData =
+    override fun findDataForClassOrObject(classOrObject: KtClassOrObject): LightClassData =
             LazyLightClassData(relyOnDummySupertypes = classOrObject.getSuperTypeList() == null) { lightClassBuilderResult ->
                 lightClassBuilderResult.stub.findDelegate(classOrObject)
             }
