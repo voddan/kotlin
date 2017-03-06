@@ -76,7 +76,7 @@ class LazyLightClassDataHolder(
                 val fieldName = dummyDelegate.name!!
                 KtLightFieldImpl.lazy(dummyDelegate, memberOrigin, containingClass) {
                     clsDelegate.findFieldByName(fieldName, false)!!.apply {
-                        assert(this.codegenMarker!! == dummyDelegate.codegenMarker!!)
+                        assert(this.memberIndex!! == dummyDelegate.memberIndex!!)
                     }
                 }
             }
@@ -88,9 +88,9 @@ class LazyLightClassDataHolder(
             return dummyDelegate!!.methods.map { dummyDelegate ->
                 val methodName = dummyDelegate.name
                 KtLightMethodImpl.lazy(dummyDelegate, containingClass, ClsWrapperStubPsiFactory.getMemberOrigin(dummyDelegate)) {
-                    val dummyMarker = dummyDelegate.codegenMarker!!
+                    val dummyMarker = dummyDelegate.memberIndex!!
                     clsDelegate.findMethodsByName(methodName, false).filter {
-                        delegateCandidate -> delegateCandidate.codegenMarker == dummyMarker
+                        delegateCandidate -> delegateCandidate.memberIndex == dummyMarker
                     }.single().apply {
                         assert(this.parameterList.parametersCount == dummyDelegate.parameterList.parametersCount)
                     }

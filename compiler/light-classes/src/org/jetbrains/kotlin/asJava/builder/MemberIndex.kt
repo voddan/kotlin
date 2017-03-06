@@ -21,18 +21,12 @@ import com.intellij.openapi.util.UserDataHolder
 import com.intellij.psi.PsiMember
 import com.intellij.psi.StubBasedPsiElement
 
-data class CodegenMarker(private val index: Int) {
+data class MemberIndex(private val index: Int) {
     companion object {
         @JvmField
-        val KEY = Key.create<CodegenMarker>("MARKER")
+        val KEY = Key.create<MemberIndex>("MEMBER_INDEX")
     }
 }
 
-class CodegenMarkerProvider {
-    private var i: Int = 0
-
-    fun nextMarker(): CodegenMarker = CodegenMarker(i++)
-}
-
-val PsiMember.codegenMarker: CodegenMarker?
-    get() = ((this as? StubBasedPsiElement<*>)?.stub as? UserDataHolder)?.getUserData(CodegenMarker.KEY)
+val PsiMember.memberIndex: MemberIndex?
+    get() = ((this as? StubBasedPsiElement<*>)?.stub as? UserDataHolder)?.getUserData(MemberIndex.KEY)

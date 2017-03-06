@@ -53,7 +53,7 @@ public class StubClassBuilder extends AbstractClassBuilder {
     private StubBuildingVisitor v;
     private final Stack<StubElement> parentStack;
     private boolean isPackageClass = false;
-    private final CodegenMarkerProvider markerProvider = new CodegenMarkerProvider();
+    private int memberIndex = 0;
 
     public StubClassBuilder(@NotNull Stack<StubElement> parentStack) {
         this.parentStack = parentStack;
@@ -197,7 +197,7 @@ public class StubClassBuilder extends AbstractClassBuilder {
         }
 
         last.putUserData(ClsWrapperStubPsiFactory.ORIGIN, LightElementOriginKt.toLightMemberOrigin(origin));
-        last.putUserData(CodegenMarker.KEY, markerProvider.nextMarker());
+        last.putUserData(MemberIndex.KEY, new MemberIndex(memberIndex++));
     }
 
     @Override
