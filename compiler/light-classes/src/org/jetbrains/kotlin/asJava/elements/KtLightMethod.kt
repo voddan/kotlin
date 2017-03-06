@@ -43,14 +43,14 @@ interface KtLightMethod : PsiAnnotationMethod, KtLightDeclaration<KtDeclaration,
 }
 
 class KtLightMethodImpl private constructor(
-        computeDelegate: () -> PsiMethod,
+        computeRealDelegate: () -> PsiMethod,
         override val lightMethodOrigin: LightMemberOrigin?,
         private val containingClass: KtLightClass,
         private val dummyDelegate: PsiMethod? = null
 ) : LightElement(containingClass.manager, containingClass.language), KtLightMethod {
     override val kotlinOrigin: KtDeclaration? get() = lightMethodOrigin?.originalElement as? KtDeclaration
 
-    override val clsDelegate by lazy(computeDelegate)
+    override val clsDelegate by lazy(LazyThreadSafetyMode.PUBLICATION, computeRealDelegate)
 
     private val lightIdentifier by lazy(LazyThreadSafetyMode.PUBLICATION) { KtLightIdentifier(this, kotlinOrigin as? KtNamedDeclaration) }
     private val returnTypeElem by lazy(LazyThreadSafetyMode.PUBLICATION) {
@@ -241,8 +241,13 @@ class KtLightMethodImpl private constructor(
         }
 
         @JvmStatic
-        fun lazy(dummyDelegate: PsiMethod?, containingClass: KtLightClass, origin: LightMemberOriginForDeclaration?, computeDelegate: () -> PsiMethod): KtLightMethodImpl {
-            return KtLightMethodImpl(computeDelegate, adjustMethodOrigin(origin), containingClass, dummyDelegate)
+        fun lazy(
+                dummyDelegate: PsiMethod?,
+                containingClass: KtLightClass,
+                origin: LightMemberOriginForDeclaration?,
+                computeRealDelegate: () -> PsiMethod
+        ): KtLightMethodImpl {
+            return KtLightMethodImpl(computeRealDelegate, adjustMethodOrigin(origin), containingClass, dummyDelegate)
         }
     }
 

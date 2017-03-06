@@ -109,6 +109,7 @@ private fun setupAdHocResolve(project: Project, realWorldModule: ModuleDescripto
         useImpl<FileScopeProviderImpl>()
         useImpl<AdHocAnnotationResolver>()
 
+        // TODO_R: language version
         useInstance(LanguageVersion.LATEST)
         useImpl<CompilerDeserializationConfiguration>()
         useImpl<MetadataPackageFragmentProvider>()
@@ -118,7 +119,7 @@ private fun setupAdHocResolve(project: Project, realWorldModule: ModuleDescripto
         useInstance(object : WrappedTypeFactory(sm) {
             override fun createLazyWrappedType(computation: () -> KotlinType): KotlinType = ErrorUtils.createErrorType("^_^")
 
-            override fun createDeferredType(trace: BindingTrace, computation: () -> KotlinType) = ErrorUtils.createErrorType("^_^")
+            override fun createDeferredType(trace: BindingTrace, computation: () -> KotlinType) = ErrorUtils.createErrorType("^_^") // TODO_R: message
 
             override fun createRecursionIntolerantDeferredType(trace: BindingTrace, computation: () -> KotlinType) = ErrorUtils.createErrorType("^_^")
         })
@@ -137,6 +138,7 @@ private fun setupAdHocResolve(project: Project, realWorldModule: ModuleDescripto
     return resolveSession
 }
 
+// TODO_R: strictfp etc
 private val annotationsThatAffectCodegen = listOf("JvmField", "JvmOverloads", "JvmName", "JvmStatic").map { FqName("kotlin.jvm").child(Name.identifier(it)) }
 
 class AdHocAnnotationResolver(
@@ -182,6 +184,7 @@ class AdHocAnnotationResolver(
             override fun getExplicitReceiverKind() = error("TODO")
             override fun getValueArguments() =
                     annotationConstructor.valueParameters.singleOrNull()?.let { mapOf(it to FakeResolvedValueArgument(valueArgumentText)) }.orEmpty()
+
             override fun getValueArgumentsByIndex() = error("TODO")
             override fun getArgumentMapping(valueArgument: ValueArgument) = error("TODO")
             override fun getTypeArguments() = error("TODO")
@@ -209,7 +212,7 @@ class AdHocAnnotationResolver(
         return super.getAnnotationArgumentValue(trace, valueParameter, resolvedArgument)
     }
 
-    private class FakeResolvedValueArgument(val argumentText: String): ResolvedValueArgument {
+    private class FakeResolvedValueArgument(val argumentText: String) : ResolvedValueArgument {
         override fun getArguments() = error("TODO")
     }
 }
